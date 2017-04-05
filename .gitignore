@@ -1,0 +1,7 @@
+# ignore everything
+*
+
+# except...
+!*.java
+!.gitignore
+!README

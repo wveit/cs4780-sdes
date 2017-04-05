@@ -1,9 +1,115 @@
-
+import java.util.Arrays;
 public class SDES {
+
+
+	public static void main(String[] args){
+		System.out.println("SDES");
+		System.out.println("Encryption");
+		SDESEncryptProblems();
+		System.out.println("Decryption");
+		SDESDecryptProblems();
+	}
+
+	private static void SDESEncryptProblems(){
+		byte[][] key = new byte[4][];
+		byte[][] plaintext = new byte[4][];
+		byte[][] ciphertext = new byte[4][];
+
+		key[0] = new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		key[1] = new byte[]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+		key[2] = new byte[]{ 0, 0, 0, 0, 0, 1, 1, 1, 1, 1 };
+		key[3] = new byte[]{ 0, 0, 0, 0, 0, 1, 1, 1, 1, 1 };
+
+		plaintext[0] = new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+		plaintext[1] = new byte[]{ 1, 1, 1, 1, 1, 1, 1, 1 };
+		plaintext[2] = new byte[]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+		plaintext[3] = new byte[]{ 1, 1, 1, 1, 1, 1, 1, 1 };
+
+		for(int i = 0; i < 4; i++){
+			ciphertext[i] = SDES.Encrypt(key[i], plaintext[i]);
+//			System.out.print("plaintext:  ");
+//			printArray(plaintext[i]);
+			System.out.print("ciphertext: ");
+			printArray(ciphertext[i]);
+		}
+	}
+
+	private static void SDESDecryptProblems(){
+		byte[][] key = new byte[4][];
+		byte[][] plaintext = new byte[4][];
+		byte[][] ciphertext = new byte[4][];
+
+		key[0] = new byte[]{ 1, 0, 0, 0, 1, 0, 1, 1, 1, 0 };
+		key[1] = new byte[]{ 1, 0, 0, 0, 1, 0, 1, 1, 1, 0 };
+		key[2] = new byte[]{ 0, 0, 1, 0, 0, 1, 1, 1, 1, 1 };
+		key[3] = new byte[]{ 0, 0, 1, 0, 0, 1, 1, 1, 1, 1 };
+
+		ciphertext[0] = new byte[]{ 0, 0, 0, 1, 1, 1, 0, 0 };
+		ciphertext[1] = new byte[]{ 1, 1, 0, 0, 0, 0, 1, 0 };
+		ciphertext[2] = new byte[]{ 1, 0, 0, 1, 1, 1, 0, 1 };
+		ciphertext[3] = new byte[]{ 1, 0, 0, 1, 0, 0, 0, 0 };
+
+		for(int i = 0; i < 4; i++){
+			plaintext[i] = SDES.Decrypt(key[i], ciphertext[i]);
+			System.out.print("plaintext:  ");
+			printArray(plaintext[i]);
+//			System.out.print("ciphertext: ");
+//			printArray(ciphertext[i]);
+		}
+	}
+
+	public static void printArray(byte[] array){
+		for(int i = 0; i < array.length; i++)
+			System.out.print(array[i]);
+		System.out.println();
+	}
+
+	/////////////////////////////////////
+	//
+	//	Encrypt(...) and Decrypt(...)
+	//
+	/////////////////////////////////////
+
 	public static byte[] Encrypt(byte[] rawkey, byte[] plaintext){
 		byte[] key1 = new byte[8];
 		byte[] key2 = new byte[8];
 		generateKeys(rawkey, key1, key2);
+
+
+		int size = (int) Math.ceil(plaintext.length / 8) * 8;
+		byte[] ciphertext = new byte[size];
+
+		for(int i = 0; i < plaintext.length; i += 8){
+			byte[] subplaintext = Arrays.copyOfRange(plaintext, i, i+8);
+			byte[] temp = EncryptBlock(key1, key2, subplaintext);
+			for(int j = 0; j < 8; j++){
+				ciphertext[j + i] =  temp[j];
+			}
+		}
+		return ciphertext;
+	}
+	
+	public static byte[] Decrypt(byte[] rawkey, byte[] ciphertext){
+		byte[] key1 = new byte[8];
+		byte[] key2 = new byte[8];
+		generateKeys(rawkey, key1, key2);
+
+
+		int size = (int) Math.ceil(ciphertext.length / 8) * 8;
+		byte[] plaintext = new byte[size];
+
+		for(int i = 0; i < ciphertext.length; i += 8){
+			byte[] subciphertext = Arrays.copyOfRange(ciphertext, i, i+8);
+			byte[] temp = DecryptBlock(key1, key2, subciphertext);
+			for(int j = 0; j < 8; j++){
+				plaintext[j + i] =  temp[j];
+			}
+		}
+		return plaintext;
+	}
+
+
+	public static byte[] EncryptBlock(byte[] key1, byte[] key2, byte[] plaintext){
 		byte[] temp = initialPermute(plaintext);
 		fk(temp, key1);
 		temp = switchHalves8(temp);
@@ -12,10 +118,7 @@ public class SDES {
 		return temp;
 	}
 	
-	public static byte[] Decrypt(byte[] rawkey, byte[] ciphertext){
-		byte[] key1 = new byte[8];
-		byte[] key2 = new byte[8];
-		generateKeys(rawkey, key1, key2);
+	public static byte[] DecryptBlock(byte[] key1, byte[] key2, byte[] ciphertext){
 		byte[] temp = initialPermute(ciphertext);
 		fk(temp, key2);
 		temp = switchHalves8(temp);
@@ -236,7 +339,4 @@ public class SDES {
 		{3, 0, 1, 0}, 
 		{2, 1, 0, 3}
 	};
-	
-
-
 }
