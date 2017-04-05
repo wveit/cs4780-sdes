@@ -1,16 +1,24 @@
 import java.util.Arrays;
 public class SDES {
 
+	/////////////////////////////////////
+	//
+	//	Demonstration Methods
+	//
+	/////////////////////////////////////
 
 	public static void main(String[] args){
-		System.out.println("SDES");
-		System.out.println("Encryption");
-		SDESEncryptProblems();
-		System.out.println("Decryption");
-		SDESDecryptProblems();
+		System.out.println("================================================");
+		System.out.println("              Part 1 SDES Table");
+		System.out.println("------------------------------------------------");
+		System.out.println("  Raw Key   |   Plain Text   |  Cipher Text   ");
+		System.out.println("------------------------------------------------");
+		encryptDemo();
+		decreyptDemo();
+		System.out.println("================================================");
 	}
 
-	private static void SDESEncryptProblems(){
+	private static void encryptDemo(){
 		byte[][] key = new byte[4][];
 		byte[][] plaintext = new byte[4][];
 		byte[][] ciphertext = new byte[4][];
@@ -27,14 +35,16 @@ public class SDES {
 
 		for(int i = 0; i < 4; i++){
 			ciphertext[i] = SDES.Encrypt(key[i], plaintext[i]);
-//			System.out.print("plaintext:  ");
-//			printArray(plaintext[i]);
-			System.out.print("ciphertext: ");
+			printArray(key[i]);
+			System.out.print("       ");
+			printArray(plaintext[i]);
+			System.out.print("       ");
 			printArray(ciphertext[i]);
+			System.out.println();
 		}
 	}
 
-	private static void SDESDecryptProblems(){
+	private static void decreyptDemo(){
 		byte[][] key = new byte[4][];
 		byte[][] plaintext = new byte[4][];
 		byte[][] ciphertext = new byte[4][];
@@ -51,17 +61,18 @@ public class SDES {
 
 		for(int i = 0; i < 4; i++){
 			plaintext[i] = SDES.Decrypt(key[i], ciphertext[i]);
-			System.out.print("plaintext:  ");
+			printArray(key[i]);
+			System.out.print("       ");
 			printArray(plaintext[i]);
-//			System.out.print("ciphertext: ");
-//			printArray(ciphertext[i]);
+			System.out.print("       ");
+			printArray(ciphertext[i]);
+			System.out.println();
 		}
 	}
 
 	public static void printArray(byte[] array){
 		for(int i = 0; i < array.length; i++)
 			System.out.print(array[i]);
-		System.out.println();
 	}
 
 	/////////////////////////////////////
@@ -133,7 +144,7 @@ public class SDES {
 	//
 	/////////////////////////////////////
 	
-	public static void generateKeys(byte[] rawkey, byte[] k1, byte[] k2){
+	private static void generateKeys(byte[] rawkey, byte[] k1, byte[] k2){
 		byte[] afterP10 = keyGenPermute10(rawkey);
 		byte[] afterS1 = keyGenShift(afterP10, 1);
 		keyGenPermute10to8(afterS1, k1);
@@ -141,8 +152,7 @@ public class SDES {
 		keyGenPermute10to8(afterS2, k2);
 	}
 	
-	public static byte[] keyGenPermute10(byte[] input){
-		/* Add code for input checking here */
+	private static byte[] keyGenPermute10(byte[] input){
 		
 		byte[] output = new byte[10];
 		output[0] = input[2];
@@ -159,8 +169,7 @@ public class SDES {
 		return output;
 	}
 	
-	public static byte[] keyGenShift(byte[] input, int shiftAmount){
-		/* Add code for input checking here */
+	private static byte[] keyGenShift(byte[] input, int shiftAmount){
 		
 		byte[] output = new byte[10];
 		output[0] = input[(0 + shiftAmount) % 5];
@@ -177,7 +186,7 @@ public class SDES {
 		return output;
 	}
 	
-	public static void keyGenPermute10to8(byte[] input, byte[] output){
+	private static void keyGenPermute10to8(byte[] input, byte[] output){
 		if(input == null){
 			System.out.println("Error: SDES.keyGenPermutation10to8(input, output) got null for input");
 			System.exit(1);
@@ -190,7 +199,7 @@ public class SDES {
 			System.out.println("Error: SDES.keyGenPermutation10to8(input, output) got input of incorrect size: " + input.length + " instead of 10");
 			System.exit(1);
 		}		
-		if(input.length != 10){
+		if(output.length != 8){
 			System.out.println("Error: SDES.keyGenPermutation10to8(input, output) got output of incorrect size: " + input.length + " instead of 10");
 			System.exit(1);
 		}
@@ -211,8 +220,7 @@ public class SDES {
 	//
 	/////////////////////////////////////
 	
-	public static byte[] initialPermute(byte[] input){
-		/* Add code for input checking here */
+	private static byte[] initialPermute(byte[] input){
 		
 		byte[] output = new byte[8];
 		output[0] = input[1];
@@ -227,8 +235,7 @@ public class SDES {
 		return output;
 	}
 	
-	public static byte[] finalPermute(byte[] input){
-		/* Add code for input checking here */
+	private static byte[] finalPermute(byte[] input){
 		
 		byte[] output = new byte[8];
 		output[0] = input[3];
@@ -249,8 +256,7 @@ public class SDES {
 	//
 	/////////////////////////////////////
 	
-	public static byte[] switchHalves8(byte[] input){
-		/* Add code for input checking here */
+	private static byte[] switchHalves8(byte[] input){
 		
 		byte[] output = new byte[8];
 		output[0] = input[4];
@@ -271,14 +277,13 @@ public class SDES {
 	//
 	/////////////////////////////////////
 	
-	public static void fk(byte[] input, byte[] key){
+	private static void fk(byte[] input, byte[] key){
 		byte[] fromF = F(input, key);
 		for(int i = 0; i < 4; i++)
 			input[i] = (byte)(input[i] ^ fromF[i]);
 	}
 	
-	public static byte[] F(byte[] input, byte[] key){
-		/* check input */
+	private static byte[] F(byte[] input, byte[] key){
 		
 		byte[] temp = new byte[8];
 		temp[0] = input[7];

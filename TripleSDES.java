@@ -2,14 +2,18 @@
 public class TripleSDES {
 
 	public static void main(String[] args){
-		System.out.println("TripleSDES");
-		System.out.println("Encryption");
-		TripleSDESEncrypt();
-		System.out.println("Decryption");
-		TripleSDESDecrypt();
+		
+		System.out.println("====================================================================");
+		System.out.println("         Part 2 Triple SDES Table");
+		System.out.println("--------------------------------------------------------------------");
+		System.out.println("  Raw Key 1   |   Raw Key 2   |   Plain Text   |  Cipher Text   ");
+		System.out.println("--------------------------------------------------------------------");
+		EncryptDemo();
+		DecryptDemo();
+		System.out.println("====================================================================");
 	}
 	
-	private static void TripleSDESEncrypt(){
+	private static void EncryptDemo(){
 		byte[][] key1 = new byte[4][];
 		byte[][] key2 = new byte[4][];
 		byte[][] plaintext = new byte[4][];
@@ -32,15 +36,19 @@ public class TripleSDES {
 
 		for(int i = 0; i < 4; i++){
 			ciphertext[i] = TripleSDES.Encrypt(key1[i], key2[i], plaintext[i]);
-//			System.out.print("plaintext:  ");
-//			printArray(plaintext[i]);
-			System.out.print("ciphertext: ");
+			printArray(key1[i]);
+			System.out.print("       ");
+			printArray(key2[i]);
+			System.out.print("       ");
+			printArray(plaintext[i]);
+			System.out.print("       ");
 			printArray(ciphertext[i]);
+			System.out.println();
 		}
-}
+	}
 
 
-	private static void TripleSDESDecrypt(){
+	private static void DecryptDemo(){
 		byte[][] key1 = new byte[4][];
 		byte[][] key2 = new byte[4][];
 		byte[][] plaintext = new byte[4][];
@@ -63,17 +71,20 @@ public class TripleSDES {
 
 		for(int i = 0; i < 4; i++){
 			plaintext[i] = TripleSDES.Decrypt(key1[i], key2[i], ciphertext[i]);
-			System.out.print("plaintext:  ");
+			printArray(key1[i]);
+			System.out.print("       ");
+			printArray(key2[i]);
+			System.out.print("       ");
 			printArray(plaintext[i]);
-//			System.out.print("ciphertext: ");
-//			printArray(ciphertext[i]);
+			System.out.print("       ");
+			printArray(ciphertext[i]);
+			System.out.println();
 		}
 	}
 
 	public static void printArray(byte[] array){
 		for(int i = 0; i < array.length; i++)
 			System.out.print(array[i]);
-		System.out.println();
 	}
 
 

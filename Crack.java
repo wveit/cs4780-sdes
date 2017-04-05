@@ -1,5 +1,7 @@
 
+
 public class Crack {
+	
 	public static void main(String[] args){
 		Part1();
 		Part2();
@@ -18,11 +20,11 @@ public class Crack {
 		System.out.println(message);
 		System.out.println();
 
-		System.out.println("plaintext:");
+		System.out.println("plaintext CASCII bits:");
 		printArray(plaintext);
 		System.out.println();
 
-		System.out.println("ciphertext: ");
+		System.out.println("ciphertext CASCII bits: ");
 		printArray(ciphertext);
 		System.out.println();
 
@@ -50,11 +52,19 @@ public class Crack {
 		byte[] key = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		byte[] plaintext;
 		byte[] ciphertext = toByteArray(encrypted);
+		
+
 
 		for(int i = 0; i < 1024; i++){
 			plaintext = SDES.Decrypt(key, ciphertext);
-			printArray(key);
-			System.out.println(CASCII.toString(plaintext));
+			String str = CASCII.toString(plaintext);
+		
+			if(str.contains("THE") && countChars(str, 'E') >= countChars(str, 'S') && countChars(str, 'S') >= countChars(str, 'L') && countChars(str, 'L') >= countChars(str, 'F') && countChars(str, 'F') >= countChars(str, 'X')){
+				System.out.print("key: ");
+				printArray(key);
+				System.out.println(str);
+			}
+			
 			incrementKey(key);
 		}
 	}
@@ -73,23 +83,43 @@ public class Crack {
 		for(int i = 0; i < 1024; i++){
 			for(int j = 0; j < 1024; j++){
 				plaintext = TripleSDES.Decrypt(key1, key2, ciphertext);
-				System.out.print("key1: ");
-				printArray(key1);
-				System.out.print("key2: ");
-				printArray(key2);
-				System.out.println(CASCII.toString(plaintext));
+				
+				String str = CASCII.toString(plaintext);
+				
+				// only print strings that contain the substring "THE" and follow some of the sample letter periodicidies
+				if(str.contains("THE") 
+						&& countChars(str, 'E') >= countChars(str, 'T') 
+						&& countChars(str, 'T') >= countChars(str, 'S') 
+						&& countChars(str, 'S') >= countChars(str, 'L') 
+						&& countChars(str, 'L') >= countChars(str, 'F') 
+						&& countChars(str, 'F') >= countChars(str, 'X') 
+						&& countChars(str, 'F') >= countChars(str, 'Z') 
+						&& countChars(str, 'A') >= countChars(str, 'C')){
+					System.out.print("key1: ");
+					printArray(key1);
+					System.out.print("  key2: ");
+					printArray(key2);
+					System.out.println(str);
+				}
 				incrementKey(key1);
 			}
 			incrementKey(key2);
 		}
 	}
 
-
+	public static int countChars(String str, char c){
+		int count = 0;
+		
+		for(int i = 0; i < str.length(); i++){
+			if(str.charAt(i) == c)
+				count++;
+		}
+		return count;
+	}
 
 	public static void printArray(byte[] array){
 		for(int i = 0; i < array.length; i++)
 			System.out.print(array[i] + " ");
-		System.out.println();
 	}
 
 
