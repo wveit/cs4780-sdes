@@ -59,7 +59,7 @@ public class Crack {
 			plaintext = SDES.Decrypt(key, ciphertext);
 			String str = CASCII.toString(plaintext);
 		
-			if(str.contains("THE") && countChars(str, 'E') >= countChars(str, 'S') && countChars(str, 'S') >= countChars(str, 'L') && countChars(str, 'L') >= countChars(str, 'F') && countChars(str, 'F') >= countChars(str, 'X')){
+			if(str.contains("THE") && followsPunctuationRules(str)){
 				System.out.print("key: ");
 				printArray(key);
 				System.out.println(str);
@@ -87,14 +87,7 @@ public class Crack {
 				String str = CASCII.toString(plaintext);
 				
 				// only print strings that contain the substring "THE" and follow some of the sample letter periodicidies
-				if(str.contains("THE") 
-						&& countChars(str, 'E') >= countChars(str, 'T') 
-						&& countChars(str, 'T') >= countChars(str, 'S') 
-						&& countChars(str, 'S') >= countChars(str, 'L') 
-						&& countChars(str, 'L') >= countChars(str, 'F') 
-						&& countChars(str, 'F') >= countChars(str, 'X') 
-						&& countChars(str, 'F') >= countChars(str, 'Z') 
-						&& countChars(str, 'A') >= countChars(str, 'C')){
+				if(str.contains("THE") && followsPunctuationRules(str)){
 					System.out.print("key1: ");
 					printArray(key1);
 					System.out.print("  key2: ");
@@ -106,8 +99,32 @@ public class Crack {
 			incrementKey(key2);
 		}
 	}
+	
+	private static boolean followsPunctuationRules(String str){
+		for(int i = 0; i < str.length() - 1; i++){
+			char c = str.charAt(i);
+			if(c == '.' || c == '?' || c == ',' || c == ':'){
+				if(str.charAt(i + 1) != ' ')
+					return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	private static boolean followsCharacterRules(String str){
+		return countChars(str, 'E') >= countChars(str, 'T') 
+				&& countChars(str, 'T') >= countChars(str, 'S') 
+				&& countChars(str, 'S') >= countChars(str, 'L') 
+				&& countChars(str, 'L') >= countChars(str, 'F') 
+				&& countChars(str, 'F') >= countChars(str, 'X') 
+				&& countChars(str, 'F') >= countChars(str, 'Z') 
+				&& countChars(str, 'A') >= countChars(str, 'C');
+	}
+	
 
-	public static int countChars(String str, char c){
+
+	private static int countChars(String str, char c){
 		int count = 0;
 		
 		for(int i = 0; i < str.length(); i++){
@@ -117,13 +134,13 @@ public class Crack {
 		return count;
 	}
 
-	public static void printArray(byte[] array){
+	private static void printArray(byte[] array){
 		for(int i = 0; i < array.length; i++)
 			System.out.print(array[i] + " ");
 	}
 
 
-	public static byte[] toByteArray (String message){
+	private static byte[] toByteArray (String message){
 		byte[] temp = new byte[message.length()];
 		for(int i = 0; i < message.length(); i++){
 			temp[i] = (message.charAt(i) == '1') ? (byte)1 : (byte)0;
@@ -131,7 +148,7 @@ public class Crack {
 		return temp;
 	}
 
-	public static void incrementKey (byte[] key){
+	private static void incrementKey (byte[] key){
 		if (key[9] == 0) {
 			key[9] = 1;
 			return;
